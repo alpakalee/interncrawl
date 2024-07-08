@@ -1,0 +1,5 @@
+git add .
+
+git commit -m "메모"
+
+git push origin main
