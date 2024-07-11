@@ -10,13 +10,6 @@ import pandas as pd
 import tkinter as tk
 from tkinter import messagebox
 
-# 기본 키워드 리스트
-default_keywords = [
-    "웨딩", "결혼", "박람회", "신혼", "돌잔치", "플래너", "팔순", "피로연", 
-    "어반브룩", "광주", "남구", "메이크업", "프로필", "강남", "청담", 
-    "스튜디오", "협찬"
-]
-
 results = []
 seen_data = set()
 current_index = 0
@@ -43,10 +36,14 @@ def get_user_input():
     def on_submit():
         user_input['userid'] = id_entry.get()
         user_input['userpw'] = pw_entry.get()
-        user_input['target'] = int(target_entry.get())
-        additional_keywords = keywords_entry.get()
-        user_input['keywords'] = [keyword.strip() for keyword in additional_keywords.split(",") if keyword.strip()]
-        print(user_input)
+        try:
+            user_input['target'] = int(target_entry.get())
+        except ValueError:
+            messagebox.showerror("Error", "수집할 게시글의 수는 숫자여야 합니다.")
+            return
+
+        user_keywords = keywords_entry.get()
+        user_input['keywords'] = [keyword.strip() for keyword in user_keywords.split(",") if keyword.strip()]
         root.quit()
 
     root = tk.Tk()
@@ -65,20 +62,18 @@ def get_user_input():
     target_entry = tk.Entry(root, width=40)
     target_entry.grid(row=2, column=1, pady=5, sticky='w', padx=10)
 
-    default_keywords_str = ", ".join(default_keywords)
-    tk.Label(root, text="추가할 키워드를 입력하세요 (쉼표로 구분):", padx=10).grid(row=3, column=0, pady=5, sticky='w')
-    tk.Label(root, text=f"기본 키워드: [{default_keywords_str}]", padx=10).grid(row=4, column=0, columnspan=2, pady=5, sticky='w')
+    tk.Label(root, text="키워드를 입력하세요 (쉼표로 구분) ex) 웨딩,결혼,박람회", padx=10).grid(row=3, column=0, pady=5, sticky='w')
     keywords_entry = tk.Entry(root, width=100)
-    keywords_entry.grid(row=5, column=0, columnspan=2, pady=5, padx=10)
+    keywords_entry.grid(row=4, column=0, columnspan=2, pady=5, padx=10)
 
     submit_button = tk.Button(root, text="Submit", command=on_submit)
-    submit_button.grid(row=6, column=0, columnspan=2, pady=10)
+    submit_button.grid(row=5, column=0, columnspan=2, pady=10)
 
     root.mainloop()
     
     return user_input
 
-def login_and_search(userid, userpw, target, additional_keywords):
+def login_and_search(userid, userpw, target, user_keywords):
     driver = driversetup(url)
 
     id_box = driver.find_element(By.XPATH, '//*[@id="loginForm"]/div/div[1]/div/label/input')
@@ -128,7 +123,7 @@ def login_and_search(userid, userpw, target, additional_keywords):
             except:
                 place = ''
 
-            if any(keyword in hashtag for keyword in keywords for hashtag in hashtags):
+            if not keywords or any(keyword in hashtag for keyword in keywords for hashtag in hashtags):
                 if target_id not in seen_data:
                     seen_data.add(target_id)
                     results.append({"Target ID": target_id, "위치": place, "Hashtags": hashtags})
@@ -160,10 +155,7 @@ def login_and_search(userid, userpw, target, additional_keywords):
         df.to_excel(file_name, index=False)
         print(f"Results saved to {file_name}")
 
-    if additional_keywords:
-        keywords = additional_keywords
-    else:
-        keywords = default_keywords
+    keywords = user_keywords if user_keywords else None
 
     select_first(driver)
     get_content(driver, keywords, first_click=True)
@@ -181,7 +173,7 @@ def login_and_search(userid, userpw, target, additional_keywords):
 def main():
     user_input = get_user_input()
 
-    if user_input and all(key in user_input for key in ['userid', 'userpw', 'target', 'keywords']):
+    if user_input and all(key in user_input for key in ['userid', 'userpw', 'target']):
         login_and_search(user_input['userid'], user_input['userpw'], user_input['target'], user_input['keywords'])
     else:
         messagebox.showerror("Error", "모든 입력을 완료해 주세요.")
