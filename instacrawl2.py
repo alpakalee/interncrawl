@@ -107,7 +107,6 @@ def login_and_search(userid, userpw, target, additional_keywords):
             parent_div = driver.find_element(By.CLASS_NAME, '_aaqt')
             a_tag = parent_div.find_element(By.TAG_NAME, 'a')
             target_id = a_tag.text
-            print(target_id)
 
             hashtags = []
             try:
@@ -146,7 +145,7 @@ def login_and_search(userid, userpw, target, additional_keywords):
                 print("재시작합니다")
             except Exception as close_error:
                 print(f"재시작 중 에러가 발생했습니다: {close_error}")
-                input("에러가 발생했습니다. 계속하려면 엔터를 누르세요...")
+                input("계속하려면 엔터를 누르세요...")
                 return False
             return True
         current_index += 1
@@ -176,9 +175,8 @@ def login_and_search(userid, userpw, target, additional_keywords):
 
 def main():
     root = tk.Tk()
-    root.withdraw()
-
     user_input = get_user_input(root)
+    root.withdraw()  # 사용자 입력을 받은 후 창을 숨깁니다.
 
     if user_input and all(key in user_input for key in ['userid', 'userpw', 'target', 'keywords']):
         login_and_search(user_input['userid'], user_input['userpw'], user_input['target'], user_input['keywords'])
