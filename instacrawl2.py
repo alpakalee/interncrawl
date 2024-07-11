@@ -35,7 +35,7 @@ def driversetup(url):
     return driver
 ###################################################################################################
 
-def get_user_input(root):
+def get_user_input():
     user_input = {}
 
     def on_submit():
@@ -44,34 +44,34 @@ def get_user_input(root):
         user_input['target'] = int(target_entry.get())
         additional_keywords = keywords_entry.get()
         user_input['keywords'] = [keyword.strip() for keyword in additional_keywords.split(",")]
-        input_window.destroy()
+        root.quit()
 
-    input_window = tk.Toplevel(root)
-    input_window.title("사용자 입력")
+    root = tk.Tk()
+    root.title("사용자 입력")
+    root.geometry("400x300")  # 창 크기 고정
 
-    tk.Label(input_window, text="인스타그램 아이디:").grid(row=0, column=0, pady=5)
-    id_entry = tk.Entry(input_window)
-    id_entry.grid(row=0, column=1, pady=5)
+    tk.Label(root, text="인스타그램 아이디:").grid(row=0, column=0, pady=5, sticky='e')
+    id_entry = tk.Entry(root, width=30)
+    id_entry.grid(row=0, column=1, pady=5, sticky='w')
 
-    tk.Label(input_window, text="인스타그램 비밀번호:").grid(row=1, column=0, pady=5)
-    pw_entry = tk.Entry(input_window, show='*')
-    pw_entry.grid(row=1, column=1, pady=5)
+    tk.Label(root, text="인스타그램 비밀번호:").grid(row=1, column=0, pady=5, sticky='e')
+    pw_entry = tk.Entry(root, show='*', width=30)
+    pw_entry.grid(row=1, column=1, pady=5, sticky='w')
 
-    tk.Label(input_window, text="수집할 게시글의 수:").grid(row=2, column=0, pady=5)
-    target_entry = tk.Entry(input_window)
-    target_entry.grid(row=2, column=1, pady=5)
+    tk.Label(root, text="수집할 게시글의 수:").grid(row=2, column=0, pady=5, sticky='e')
+    target_entry = tk.Entry(root, width=30)
+    target_entry.grid(row=2, column=1, pady=5, sticky='w')
 
     default_keywords_str = ", ".join(default_keywords)
-    tk.Label(input_window, text=f"추가할 키워드를 입력하세요 (쉼표로 구분):\n기본 키워드: [{default_keywords_str}]").grid(row=3, column=0, columnspan=2, pady=5)
-    keywords_entry = tk.Entry(input_window)
+    tk.Label(root, text="추가할 키워드를 입력하세요 (쉼표로 구분):").grid(row=3, column=0, pady=5, sticky='e')
+    tk.Label(root, text=f"기본 키워드: [{default_keywords_str}]").grid(row=3, column=1, pady=5, sticky='w')
+    keywords_entry = tk.Entry(root, width=30)
     keywords_entry.grid(row=4, column=0, columnspan=2, pady=5)
 
-    submit_button = tk.Button(input_window, text="Submit", command=on_submit)
+    submit_button = tk.Button(root, text="Submit", command=on_submit)
     submit_button.grid(row=5, column=0, columnspan=2, pady=10)
 
-    input_window.transient(root)
-    input_window.grab_set()
-    root.wait_window(input_window)
+    root.mainloop()
     
     return user_input
 
@@ -96,7 +96,7 @@ def login_and_search(userid, userpw, target, additional_keywords):
             second_element.click()
             time.sleep(5)
         else:
-            print("두 번째 요소를 찾을 수 없습니다.")
+            print("첫 시작할 게시글을 찾지 못했습니다.")
 
     def get_content(driver, keywords, first_click=False):
         global current_index
@@ -145,7 +145,6 @@ def login_and_search(userid, userpw, target, additional_keywords):
                 print("재시작합니다")
             except Exception as close_error:
                 print(f"재시작 중 에러가 발생했습니다: {close_error}")
-                input("계속하려면 엔터를 누르세요...")
                 return False
             return True
         current_index += 1
@@ -166,7 +165,7 @@ def login_and_search(userid, userpw, target, additional_keywords):
     while current_index < target:
         print(f"{current_index + 1}번째 게시글 크롤링 중")
         if not get_content(driver, keywords):
-            input("다시 시작하려면 엔터를 누르세요...")
+            input("재시도 하려면 엔터를 누르세요...")
             continue
 
     save_results()
@@ -174,14 +173,12 @@ def login_and_search(userid, userpw, target, additional_keywords):
     driver.quit()
 
 def main():
-    root = tk.Tk()
-    user_input = get_user_input(root)
-    root.withdraw()  # 사용자 입력을 받은 후 창을 숨깁니다.
+    user_input = get_user_input()
 
     if user_input and all(key in user_input for key in ['userid', 'userpw', 'target', 'keywords']):
         login_and_search(user_input['userid'], user_input['userpw'], user_input['target'], user_input['keywords'])
     else:
-        messagebox.showerror("Error", "모든 입력을 완료해 주세요.", parent=root)
+        messagebox.showerror("Error", "모든 입력을 완료해 주세요.")
 
 if __name__ == "__main__":
     main()
