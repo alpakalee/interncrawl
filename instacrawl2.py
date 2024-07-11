@@ -48,28 +48,28 @@ def get_user_input():
 
     root = tk.Tk()
     root.title("사용자 입력")
-    root.geometry("400x300")  # 창 크기 고정
+    root.geometry("760x230")  # 창 크기 고정
 
-    tk.Label(root, text="인스타그램 아이디:").grid(row=0, column=0, pady=5, sticky='e')
-    id_entry = tk.Entry(root, width=30)
-    id_entry.grid(row=0, column=1, pady=5, sticky='w')
+    tk.Label(root, text="인스타그램 아이디:", padx=10).grid(row=0, column=0, pady=5, sticky='w')
+    id_entry = tk.Entry(root, width=40)
+    id_entry.grid(row=0, column=1, pady=5, sticky='w', padx=10)
 
-    tk.Label(root, text="인스타그램 비밀번호:").grid(row=1, column=0, pady=5, sticky='e')
-    pw_entry = tk.Entry(root, show='*', width=30)
-    pw_entry.grid(row=1, column=1, pady=5, sticky='w')
+    tk.Label(root, text="인스타그램 비밀번호:", padx=10).grid(row=1, column=0, pady=5, sticky='w')
+    pw_entry = tk.Entry(root, show='*', width=40)
+    pw_entry.grid(row=1, column=1, pady=5, sticky='w', padx=10)
 
-    tk.Label(root, text="수집할 게시글의 수:").grid(row=2, column=0, pady=5, sticky='e')
-    target_entry = tk.Entry(root, width=30)
-    target_entry.grid(row=2, column=1, pady=5, sticky='w')
+    tk.Label(root, text="수집할 게시글의 수:", padx=10).grid(row=2, column=0, pady=5, sticky='w')
+    target_entry = tk.Entry(root, width=40)
+    target_entry.grid(row=2, column=1, pady=5, sticky='w', padx=10)
 
     default_keywords_str = ", ".join(default_keywords)
-    tk.Label(root, text="추가할 키워드를 입력하세요 (쉼표로 구분):").grid(row=3, column=0, pady=5, sticky='e')
-    tk.Label(root, text=f"기본 키워드: [{default_keywords_str}]").grid(row=3, column=1, pady=5, sticky='w')
-    keywords_entry = tk.Entry(root, width=30)
-    keywords_entry.grid(row=4, column=0, columnspan=2, pady=5)
+    tk.Label(root, text="추가할 키워드를 입력하세요 (쉼표로 구분):", padx=10).grid(row=3, column=0, pady=5, sticky='w')
+    tk.Label(root, text=f"기본 키워드: [{default_keywords_str}]", padx=10).grid(row=4, column=0, columnspan=2, pady=5, sticky='w')
+    keywords_entry = tk.Entry(root, width=100)
+    keywords_entry.grid(row=5, column=0, columnspan=2, pady=5, padx=10)
 
     submit_button = tk.Button(root, text="Submit", command=on_submit)
-    submit_button.grid(row=5, column=0, columnspan=2, pady=10)
+    submit_button.grid(row=6, column=0, columnspan=2, pady=10)
 
     root.mainloop()
     
@@ -96,7 +96,7 @@ def login_and_search(userid, userpw, target, additional_keywords):
             second_element.click()
             time.sleep(5)
         else:
-            print("첫 시작할 게시글을 찾지 못했습니다.")
+            print("크롤링을 시작할 첫 게시물을 찾지 못했습니다.")
 
     def get_content(driver, keywords, first_click=False):
         global current_index
@@ -165,7 +165,7 @@ def login_and_search(userid, userpw, target, additional_keywords):
     while current_index < target:
         print(f"{current_index + 1}번째 게시글 크롤링 중")
         if not get_content(driver, keywords):
-            input("재시도 하려면 엔터를 누르세요...")
+            input("다시 시작하려면 엔터를 누르세요...")
             continue
 
     save_results()
