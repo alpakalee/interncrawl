@@ -3,3 +3,7 @@ git add .
 git commit -m "메모"
 
 git push origin main
+
+
+git reset --hard HEAD~1
+이 명령은 마지막 커밋을 삭제하고 변경 사항을 모두 제거합니다.
