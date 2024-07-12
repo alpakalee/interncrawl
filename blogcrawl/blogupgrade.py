@@ -137,7 +137,7 @@ def get_user_input():
 
     root = tk.Tk()
     root.title("블로그 크롤링 입력")
-    root.geometry("600x250")
+    root.geometry("580x310")
 
     tk.Label(root, text="키워드를 입력하세요 (쉼표로 구분):").grid(row=0, column=0, padx=10, pady=10, sticky='w')
     keyword_entry = tk.Entry(root, width=40)
@@ -148,18 +148,19 @@ def get_user_input():
     tk.Label(root, text="반드시 포함할 단어 (쉼표로 구분):").grid(row=2, column=0, padx=10, pady=10, sticky='w')
     must_include_entry = tk.Entry(root, width=40)
     must_include_entry.grid(row=2, column=1, padx=10, pady=10, sticky='w')
-    tk.Label(root, text="예시) 준비,예식").grid(row=1, column=1, padx=10, pady=0, sticky='w')
-    tk.Label(root, text="제외할 단어 (쉼표로 구분):").grid(row=3, column=0, padx=10, pady=10, sticky='w')
-    must_exclude_entry = tk.Entry(root, width=40)
-    must_exclude_entry.grid(row=3, column=1, padx=10, pady=10, sticky='w')
-    tk.Label(root, text="예시) 광고,광고료").grid(row=1, column=1, padx=10, pady=0, sticky='w')
+    tk.Label(root, text="예시) 준비,예식").grid(row=3, column=1, padx=10, pady=0, sticky='w')
 
-    tk.Label(root, text="수집할 블로그의 수:").grid(row=4, column=0, padx=10, pady=10, sticky='w')
+    tk.Label(root, text="제외할 단어 (쉼표로 구분):").grid(row=4, column=0, padx=10, pady=10, sticky='w')
+    must_exclude_entry = tk.Entry(root, width=40)
+    must_exclude_entry.grid(row=4, column=1, padx=10, pady=10, sticky='w')
+    tk.Label(root, text="예시) 광고,광고료").grid(row=5, column=1, padx=10, pady=0, sticky='w')
+
+    tk.Label(root, text="수집할 블로그의 수:").grid(row=6, column=0, padx=10, pady=10, sticky='w')
     target_entry = tk.Entry(root, width=40)
-    target_entry.grid(row=4, column=1, padx=10, pady=10, sticky='w')
+    target_entry.grid(row=6, column=1, padx=10, pady=10, sticky='w')
 
     submit_button = tk.Button(root, text="실행", command=on_submit)
-    submit_button.grid(row=5, column=0, columnspan=2, pady=10)
+    submit_button.grid(row=7, column=0, columnspan=2, pady=10)
 
     root.mainloop()
 
