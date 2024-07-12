@@ -21,7 +21,7 @@ def driversetup(url):
     time.sleep(3)
     return driver
 
-def start_crawling(keywords, target):
+def start_crawling(keywords, must_include, must_exclude, target):
     naver_url = 'https://www.naver.com'
     driver = driversetup(naver_url)
 
@@ -30,6 +30,11 @@ def start_crawling(keywords, target):
 
     # 키워드 입력 및 검색
     search_query = " | ".join(keywords)
+    if must_include:
+        search_query += " " + " ".join([f"+{word}" for word in must_include])
+    if must_exclude:
+        search_query += " " + " ".join([f"-{word}" for word in must_exclude])
+
     search_box.send_keys(search_query)
     search_box.send_keys(Keys.RETURN)
 
@@ -106,6 +111,9 @@ def start_crawling(keywords, target):
     wb.save(output_filename)
     os.remove(temp_filename)
 
+    # 파일 경로 확인
+    print(f"엑셀 파일이 현재 디렉토리에 저장되었습니다: {os.path.abspath(output_filename)}")
+
     # 결과 출력
     for i, row in df.iterrows():
         print(f"Targetmail: {row['Targetmail']}, Targetlink: {row['Targetlink']}")
@@ -118,6 +126,8 @@ def get_user_input():
 
     def on_submit():
         user_input['keywords'] = [keyword.strip() for keyword in keyword_entry.get().split(',')]
+        user_input['must_include'] = [word.strip() for word in must_include_entry.get().split(',') if word.strip()]
+        user_input['must_exclude'] = [word.strip() for word in must_exclude_entry.get().split(',') if word.strip()]
         try:
             user_input['target'] = int(target_entry.get())
             root.quit()
@@ -127,20 +137,29 @@ def get_user_input():
 
     root = tk.Tk()
     root.title("블로그 크롤링 입력")
-    root.geometry("530x150")
+    root.geometry("600x250")
 
     tk.Label(root, text="키워드를 입력하세요 (쉼표로 구분):").grid(row=0, column=0, padx=10, pady=10, sticky='w')
     keyword_entry = tk.Entry(root, width=40)
     keyword_entry.grid(row=0, column=1, padx=10, pady=10, sticky='w')
 
-    tk.Label(root, text="                   예시) 웨딩,결혼,플래너").grid(row=1, column=0, padx=10, pady=0, sticky='w')
+    tk.Label(root, text="예시) 웨딩,결혼,플래너").grid(row=1, column=1, padx=10, pady=0, sticky='w')
 
-    tk.Label(root, text="수집할 블로그의 수:").grid(row=2, column=0, padx=10, pady=10, sticky='w')
+    tk.Label(root, text="반드시 포함할 단어 (쉼표로 구분):").grid(row=2, column=0, padx=10, pady=10, sticky='w')
+    must_include_entry = tk.Entry(root, width=40)
+    must_include_entry.grid(row=2, column=1, padx=10, pady=10, sticky='w')
+    tk.Label(root, text="예시) 준비,예식").grid(row=1, column=1, padx=10, pady=0, sticky='w')
+    tk.Label(root, text="제외할 단어 (쉼표로 구분):").grid(row=3, column=0, padx=10, pady=10, sticky='w')
+    must_exclude_entry = tk.Entry(root, width=40)
+    must_exclude_entry.grid(row=3, column=1, padx=10, pady=10, sticky='w')
+    tk.Label(root, text="예시) 광고,광고료").grid(row=1, column=1, padx=10, pady=0, sticky='w')
+
+    tk.Label(root, text="수집할 블로그의 수:").grid(row=4, column=0, padx=10, pady=10, sticky='w')
     target_entry = tk.Entry(root, width=40)
-    target_entry.grid(row=2, column=1, padx=10, pady=10, sticky='w')
+    target_entry.grid(row=4, column=1, padx=10, pady=10, sticky='w')
 
     submit_button = tk.Button(root, text="실행", command=on_submit)
-    submit_button.grid(row=3, column=0, columnspan=2, pady=10)
+    submit_button.grid(row=5, column=0, columnspan=2, pady=10)
 
     root.mainloop()
 
@@ -149,8 +168,8 @@ def get_user_input():
 def main():
     user_input = get_user_input()
 
-    if user_input and 'keywords' in user_input and 'target' in user_input:
-        start_crawling(user_input['keywords'], user_input['target'])
+    if user_input and 'keywords' in user_input and 'must_include' in user_input and 'must_exclude' in user_input and 'target' in user_input:
+        start_crawling(user_input['keywords'], user_input['must_include'], user_input['must_exclude'], user_input['target'])
     else:
         messagebox.showerror("Error", "모든 입력을 완료해 주세요.")
 
