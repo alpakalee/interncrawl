@@ -8,6 +8,7 @@ import pandas as pd
 
 # keyword = input("검색할 키워드를 입력하세요: ")
 keyword = "웨딩플래너"
+target = int(input("검색할 블로그 숫자를 입력하세요: "))
 
 def driversetup(url):
     options = ChromeOptions()
@@ -44,18 +45,25 @@ latest_option.click()
 
 # 블로그 리스트 크롤링
 time.sleep(2)  # 페이지 로딩 대기
-blog_posts = driver.find_elements(By.CLASS_NAME, 'bx')
-time.sleep(2) 
-blog_links = []
 
-for post in blog_posts:
-    try:
-        if 'user_info' in post.get_attribute('innerHTML'):
-            user_info = post.find_element(By.CLASS_NAME, 'user_info')
-            link = user_info.find_element(By.TAG_NAME, 'a').get_attribute('href')
-            blog_links.append(link)
-    except:
-        print("user_info 또는 링크를 찾을 수 없습니다.")
+blog_links = []
+while len(blog_links) < target:
+    blog_posts = driver.find_elements(By.CLASS_NAME, 'bx')
+    for post in blog_posts:
+        if len(blog_links) >= target:
+            break
+        try:
+            if 'user_info' in post.get_attribute('innerHTML'):
+                user_info = post.find_element(By.CLASS_NAME, 'user_info')
+                link = user_info.find_element(By.TAG_NAME, 'a').get_attribute('href')
+                if link not in blog_links:
+                    blog_links.append(link)
+        except:
+            print("user_info 또는 링크를 찾을 수 없습니다.")
+
+    # 스크롤 내리기
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(2)
 
 # Targetmail 및 Targetlink 생성
 data = []
@@ -71,7 +79,7 @@ df = pd.DataFrame(data)
 current_time = time.strftime("%Y%m%d_%H%M%S")
 
 # 엑셀 파일로 출력
-output_filename = f"output_{current_time}.xlsx"
+output_filename = f"blogtarget_{current_time}.xlsx"
 df.to_excel(output_filename, index=False)
 
 # 결과 출력
