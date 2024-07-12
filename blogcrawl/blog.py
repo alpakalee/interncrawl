@@ -5,6 +5,8 @@ import time
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver import ChromeOptions
 import pandas as pd
+import openpyxl
+import os
 
 # keyword = input("검색할 키워드를 입력하세요: ")
 keyword = "웨딩플래너"
@@ -78,9 +80,32 @@ df = pd.DataFrame(data)
 # 현재 시간 가져오기
 current_time = time.strftime("%Y%m%d_%H%M%S")
 
-# 엑셀 파일로 출력
+# 임시 엑셀 파일로 저장 (하이퍼링크 추가 전)
+temp_filename = f"temp_blogtarget_{current_time}.xlsx"
+df.to_excel(temp_filename, index=False)
+
+# openpyxl을 사용하여 하이퍼링크 추가 및 열 너비 조정
+wb = openpyxl.load_workbook(temp_filename)
+ws = wb.active
+
+for row in range(2, ws.max_row + 1):
+    email = ws[f"A{row}"].value
+    email_link = f"mailto:{email}"
+    ws[f"A{row}"].hyperlink = email_link
+    ws[f"A{row}"].style = "Hyperlink"
+    
+    target_link = ws[f"B{row}"].value
+    ws[f"B{row}"].hyperlink = target_link
+    ws[f"B{row}"].style = "Hyperlink"
+
+# 열 너비 조정
+ws.column_dimensions['A'].width = 30  # Targetmail 열 너비 설정
+ws.column_dimensions['B'].width = 50  # Targetlink 열 너비 설정
+
+# 최종 엑셀 파일로 저장
 output_filename = f"blogtarget_{current_time}.xlsx"
-df.to_excel(output_filename, index=False)
+wb.save(output_filename)
+os.remove(temp_filename)
 
 # 결과 출력
 for i, row in df.iterrows():
